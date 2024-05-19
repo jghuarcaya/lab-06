@@ -17,23 +17,36 @@ public class SierpinskiTriangle {
     JFrame frame;
     JPanel panel;
 
-    @SuppressWarnings("serial")
-    public void display() {
-        System.out.println("display "+ count++);
+    public SierpinskiTriangle() {
+        createFrame();
+    }
+
+    public void createFrame() {
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         panel = new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
-                System.out.println("paintComponent" + countPaintComponent++);
+                System.out.println("paintComponent" + countPaintComponent++ +"panel "+panel.getSize() + "frame "+frame.getSize());
                 super.paintComponent(g);
-                paintSierpinskiTriangle(g, getSize());
+                paintSierpinskiTriangle(g, panel.getSize());
             }
         };
-        panel.addComponentListener(new ComponentAdapter() {
+        int panelResized  = 0, frameResized = 0;
+        frame.addComponentListener(new ComponentAdapter() {
+            int  frameResized = 0;
             @Override
             public void componentResized(ComponentEvent e) {
-                panel.repaint();
+                System.out.println("frameResized" + ++frameResized);
+                //panel.repaint();
+            }
+        });
+        panel.addComponentListener(new ComponentAdapter() {
+            int panelResized  = 0, frameResized = 0;
+            @Override
+            public void componentResized(ComponentEvent e) {
+                System.out.println("panelResized" + ++panelResized);
+                //panel.repaint();
             }
         });
         frame.setLayout(new BorderLayout());
@@ -45,13 +58,10 @@ public class SierpinskiTriangle {
     }
 
     public static void main(String[] args) {
-        Toolkit.getDefaultToolkit().setDynamicLayout(false);
         SierpinskiTriangle triangle = new SierpinskiTriangle();
-        triangle.display();
     }
 
     public void paintSierpinskiTriangle(Graphics g, Dimension size) {
-
         System.out.println("paintSierpinskiTriangle "+ count++);
         Graphics2D g2 = (Graphics2D) g;
         g2.drawImage(getImage(size), 0, 0, null);
