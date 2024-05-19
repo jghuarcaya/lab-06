@@ -9,13 +9,17 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class SierpinskiTriangle {
+public class SierpinskiTriangle implements Runnable {
     private int count = 0;
     private int countPaintComponent = 0;
     public static int SIZE = 1000;
+    long resizeDonePause = 500 * 1000000;
+    long lastResize = 0;
+    boolean resizeInProgress = false;
 
     JFrame frame;
     JPanel panel;
+    Thread panelThread;
 
     public SierpinskiTriangle() {
         createFrame();
@@ -24,37 +28,61 @@ public class SierpinskiTriangle {
     public void createFrame() {
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        addPanel();
+
+    }
+
+    private void resetPanel() {
+        //removePanel();
+        //addPanel();
+        panel.paint(panel.getGraphics());
+    }
+
+    private void removePanel() {
+        panel.removeAll();
+        frame.remove(panel);
+        if (panelThread != null) {
+            panelThread.interrupt();
+            try {
+                panelThread.join();
+            } catch (InterruptedException e) {
+                //throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void addPanel() {
+
         panel = new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
-                System.out.println("paintComponent" + countPaintComponent++ +"panel "+panel.getSize() + "frame "+frame.getSize());
                 super.paintComponent(g);
                 paintSierpinskiTriangle(g, panel.getSize());
             }
         };
-        int panelResized  = 0, frameResized = 0;
-        frame.addComponentListener(new ComponentAdapter() {
-            int  frameResized = 0;
-            @Override
-            public void componentResized(ComponentEvent e) {
-                System.out.println("frameResized" + ++frameResized);
-                //panel.repaint();
-            }
-        });
+
         panel.addComponentListener(new ComponentAdapter() {
-            int panelResized  = 0, frameResized = 0;
+            int panelResized = 0, frameResized = 0;
+
             @Override
             public void componentResized(ComponentEvent e) {
                 System.out.println("panelResized" + ++panelResized);
+                resizeInProgress = true;
+                lastResize = System.nanoTime();
+                System.out.println("resizeInProgress: " + resizeInProgress);
                 //panel.repaint();
             }
         });
+
         frame.setLayout(new BorderLayout());
         frame.add(panel, BorderLayout.CENTER);
         frame.pack();
         frame.setSize(SIZE, SIZE);
         frame.setVisible(true);
-        frame.addComponentListener(new FrameListen());
+
+        panelThread = new Thread(this);
+        panelThread.start();
     }
 
     public static void main(String[] args) {
@@ -62,45 +90,37 @@ public class SierpinskiTriangle {
     }
 
     public void paintSierpinskiTriangle(Graphics g, Dimension size) {
-        System.out.println("paintSierpinskiTriangle "+ count++);
+        System.out.println("paintSierpinskiTriangle " + count++);
         Graphics2D g2 = (Graphics2D) g;
-        g2.drawImage(getImage(size), 0, 0, null);
-           }
-
-    BufferedImage cachedImage;
-    Dimension cachedSize;
-    int getImageCount = 0, drawCount = 0;
-    public BufferedImage getImage(Dimension size){
-        System.out.println("getImageCount "+getImageCount++);
-        if (size.equals(cachedSize)){
-            System.out.println("size matches");
-            if (cachedImage != null) return cachedImage;
-            System.out.println("cached image null");
-        }
-        System.out.println("getImage -- start drawing "+ ++drawCount);
-        System.out.println("size "+size.width+"x"+size.height);
-        cachedSize = new Dimension(size.width, size.height);
-        cachedImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = (Graphics2D)cachedImage.getGraphics();
         g2.setBackground(Color.white);
+        g2.setColor(Color.gray);
         g2.clearRect(0, 0, size.width, size.height);
-        g2.draw3DRect(20, 20, size.width - 40, size.height - 40, true);
-        System.out.println("getImage -- done drawing " + drawCount);
-        return cachedImage;
+        int offset = 25;
+        g2.draw3DRect(offset, offset, size.width - (2 * offset), size.height - (2 * offset), true);
+        offset += 6;
+        if (!resizeInProgress)
+            g2.draw3DRect(offset, offset, size.width - (2 * offset), size.height - (2 * offset), true);
+
     }
-    private class FrameListen implements ComponentListener {
-        public void componentHidden(ComponentEvent arg0) {
-        }
-        public void componentMoved(ComponentEvent arg0) {
-        }
-        public void componentResized(ComponentEvent arg0) {
-            String message = "-------componentResized Width: " +
-                    Integer.toString(frame.getWidth());
-            System.out.println(message);
 
-        }
-        public void componentShown(ComponentEvent arg0) {
 
+    @Override
+    public void run() {
+        boolean panelClosed = false;
+        while (!panelClosed) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                //throw new RuntimeException(e);
+            }
+            if (resizeInProgress && (System.nanoTime() - lastResize > resizeDonePause)) {
+                resizeInProgress = false;
+                lastResize = 0;
+                System.out.println("resizeInProgress: " + resizeInProgress);
+                panelClosed = false;
+                resetPanel();
+            }
         }
+
     }
 }
