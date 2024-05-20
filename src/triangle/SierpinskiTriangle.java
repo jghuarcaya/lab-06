@@ -121,6 +121,6 @@ public class SierpinskiTriangle implements Runnable {
                 resetPanel();
             }
         }
-
+        System.out.println("Thread done: " + panelClosed);
     }
 }
