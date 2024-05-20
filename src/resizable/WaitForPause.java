@@ -1,6 +1,6 @@
-package triangle;
+package resizable;
 
-import static triangle.Debug.print;
+import static resizable.Debug.print;
 
 /**
  * WaitForPause takes an inactivity threshold (in ms)

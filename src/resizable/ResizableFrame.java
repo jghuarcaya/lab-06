@@ -1,4 +1,4 @@
-package triangle;
+package resizable;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -6,38 +6,34 @@ import java.awt.event.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import static triangle.Debug.print;
-import static triangle.Debug.printStackTrace;
+import static resizable.Debug.print;
+import static resizable.Debug.printStackTrace;
 
 /**
- * Main Class for the Sierpinski Triangle.
  * Creates the Frame and the Panel that holds
- * The Triangle.
+ * The Drawing (e.g. the Sierpinski Triangle)
  *
  * Calls different getImage methods depending on
  * whether the repaint comes from within a resize or
  * after the resize.
  *
  * YOU DON'T NEED to CHANGE ANYTHING HERE!!!
- * IMPLEMENT the Sierpinski Triange In TRIANGLE.
+ * IMPLEMENT the Sierpinski Triangle In TRIANGLE.
  *
  */
-public class SierpinskiTriangle {
+public class ResizableFrame {
     public static int SIZE = 1000;
     int resizeDonePause = 500;
-    Triangle triangle = new Triangle();
+    ResizableImage image;
     JFrame frame;
     JPanel panel;
     WaitForPause waitForPause;
 
-    public SierpinskiTriangle() {
+    public ResizableFrame(ResizableImage image) {
+        this.image = image;
         createFrame();
         waitForPause = new WaitForPause(resizeDonePause, () -> resizeDone());
         waitForPause.start();
-    }
-
-    public static void main(String[] args) {
-        SierpinskiTriangle triangle = new SierpinskiTriangle();
     }
 
     public void createFrame() {
@@ -87,13 +83,13 @@ public class SierpinskiTriangle {
         g2.setColor(Color.gray);
         g2.clearRect(0, 0, size.width, size.height);
         int border = 25;
-        Dimension triangleSize = new Dimension(size.width - 2 * border, size.height - 2 * border);
-        Dimension triangleOffset = new Dimension(border, border);
+        Dimension drawingSize = new Dimension(size.width - 2 * border, size.height - 2 * border);
+        Dimension drawingOffset = new Dimension(border, border);
 
         if (waitForPause.inProgress()) {
-            g.drawImage(triangle.getResizeImage(triangleSize), triangleOffset.width, triangleOffset.height, null);
+            g.drawImage(image.getResizeImage(drawingSize), drawingOffset.width, drawingOffset.height, null);
         } else {
-            g.drawImage(triangle.getImage(triangleSize), triangleOffset.width, triangleOffset.height, null);
+            g.drawImage(image.getImage(drawingSize), drawingOffset.width, drawingOffset.height, null);
             print("countFullPaint " + ++countFullPaint);
             printStackTrace("countFullPaint " + countFullPaint);
         }

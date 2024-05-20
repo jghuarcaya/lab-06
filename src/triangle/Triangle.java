@@ -1,9 +1,11 @@
 package triangle;
 
+import resizable.ResizableImage;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-import static triangle.Debug.print;
+import static resizable.Debug.print;
 
 /**
  * Implement your Sierpinski Triangle here.
@@ -18,7 +20,7 @@ import static triangle.Debug.print;
  * preview.
  *
  */
-public class Triangle {
+public class Triangle implements ResizableImage {
     int drawTriangle = 0;
     /**
      * change this method to implement the triangle!
@@ -42,16 +44,15 @@ public class Triangle {
     BufferedImage bufferedImage;
     Dimension bufferedImageSize;
 
-    public synchronized Image getImage(Dimension triangleSize) {
+    @Override
+    public Image getImage(Dimension triangleSize) {
         if (triangleSize.equals(bufferedImageSize))
             return bufferedImage;
         bufferedImage = drawTriangle(triangleSize);
         bufferedImageSize = triangleSize;
         return bufferedImage;
     }
-
-
-
+    @Override
     public Image getResizeImage(Dimension size) {
         BufferedImage bufferedImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D gBuffer = (Graphics2D) bufferedImage.getGraphics();
