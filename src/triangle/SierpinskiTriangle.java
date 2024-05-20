@@ -1,17 +1,12 @@
 package triangle;
 
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.awt.event.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import static triangle.Debug.print;
-import static triangle.Debug.printStackTrace;
 
 public class SierpinskiTriangle {
     public static int SIZE = 1000;
@@ -30,6 +25,75 @@ public class SierpinskiTriangle {
 
     public void createFrame() {
         frame = new JFrame();
+        frame.addWindowListener(new WindowListener() {
+            int windowCounter = 0;
+            @Override
+            public void windowOpened(WindowEvent e) {
+                print("---- Frame ----- windowOpened = " + ++windowCounter);
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                print("---- Frame ----- windowClosing = " + ++windowCounter);
+
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                print("---- Frame ----- windowClosed = " + ++windowCounter);
+
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+                print("---- Frame ----- windowIconified = " + ++windowCounter);
+
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                print("---- Frame ----- windowDeiconified = " + ++windowCounter);
+
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                print("---- Frame ----- windowActivated = " + ++windowCounter);
+
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                print("---- Frame ----- windowDeactivated = " + ++windowCounter);
+
+            }
+        });
+        frame.addComponentListener(new ComponentListener(){
+            int componentListener = 0;
+            @Override
+            public void componentResized(ComponentEvent e) {
+                if (waitForPause != null) waitForPause.setInProgress();
+                print("---- Frame ----- componentResized = " + ++componentListener);
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                print("---- Frame ----- componentMoved = " + ++componentListener);
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                print("---- Frame ----- componentShown = " + ++componentListener);
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                print("---- Frame ----- componentHidden = " + ++componentListener);
+            }
+
+
+
+        });
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
