@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Debug {
-    static boolean PRINT_TRACE = true;
+    static boolean PRINT_TRACE = false;
 
     public static void print(String message) {
         if (PRINT_TRACE) {
