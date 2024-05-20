@@ -16,7 +16,7 @@ import static triangle.Debug.printStackTrace;
 public class SierpinskiTriangle {
     public static int SIZE = 1000;
     int resizeDonePause = 2000;
-
+    Triangle triangle = new Triangle();
     JFrame frame;
     JPanel panel;
     WaitForPause waitForPause;
@@ -87,22 +87,12 @@ public class SierpinskiTriangle {
 
         if (!waitForPause.inProgress()) {
             Dimension triangleSize = rectSize;
-            drawTriangle(triangleSize, g, new Dimension(offset, offset));
-            print("countFullPaint " + ++countFullPaint);
-            printStackTrace("countFullPaint " + countFullPaint);
+            Dimension triangleOffset = new Dimension(offset, offset);
+            g.drawImage(triangle.getImage(triangleSize), triangleOffset.width, triangleOffset.height, null);
+            //print("countFullPaint " + ++countFullPaint);
+            //printStackTrace("countFullPaint " + countFullPaint);
         }
 
     }
-
-    private static void drawTriangle(Dimension size, Graphics g, Dimension offset) {
-        BufferedImage bufferedImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D gBuffer = (Graphics2D) bufferedImage.getGraphics();
-        int border = 6;
-        gBuffer.setColor(Color.darkGray);
-        gBuffer.drawString("Triangle goes here", border*2,border*4);
-        gBuffer.drawRect(border, border, size.width-2*border  , size.height-2*border );
-        g.drawImage(bufferedImage, offset.width, offset.height, null);
-    }
-
 
 }
