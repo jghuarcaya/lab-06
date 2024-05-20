@@ -7,7 +7,21 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import static triangle.Debug.print;
+import static triangle.Debug.printStackTrace;
 
+/**
+ * Main Class for the Sierpinski Triangle.
+ * Creates the Frame and the Panel that holds
+ * The Triangle.
+ *
+ * Calls different getImage methods depending on
+ * whether the repaint comes from within a resize or
+ * after the resize.
+ *
+ * YOU DON'T NEED to CHANGE ANYTHING HERE!!!
+ * IMPLEMENT the Sierpinski Triange In TRIANGLE.
+ *
+ */
 public class SierpinskiTriangle {
     public static int SIZE = 1000;
     int resizeDonePause = 500;
@@ -65,6 +79,7 @@ public class SierpinskiTriangle {
 
 
     int countPaint = 0, countFullPaint = 0;
+
     public void paintContentImage(Graphics g, Dimension size) {
         print("countPaint " + ++countPaint);
         Graphics2D g2 = (Graphics2D) g;
@@ -79,8 +94,8 @@ public class SierpinskiTriangle {
             g.drawImage(triangle.getResizeImage(triangleSize), triangleOffset.width, triangleOffset.height, null);
         } else {
             g.drawImage(triangle.getImage(triangleSize), triangleOffset.width, triangleOffset.height, null);
-            //print("countFullPaint " + ++countFullPaint);
-            //printStackTrace("countFullPaint " + countFullPaint);
+            print("countFullPaint " + ++countFullPaint);
+            printStackTrace("countFullPaint " + countFullPaint);
         }
 
     }

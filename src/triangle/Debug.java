@@ -3,6 +3,10 @@ package triangle;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+/**
+ * set PRINT_TRACE to true
+ * to switch on the print() method.
+ */
 public class Debug {
     static boolean PRINT_TRACE = false;
 
@@ -13,7 +17,7 @@ public class Debug {
     }
 
     public static void printStackTrace(String message) {
-        if (!PRINT_TRACE)return;
+        if (!PRINT_TRACE) return;
         try {
             throw new Exception(message);
         } catch (Exception e) {
