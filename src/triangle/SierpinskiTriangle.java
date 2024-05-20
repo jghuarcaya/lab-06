@@ -3,6 +3,7 @@ package triangle;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -10,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import static triangle.Debug.print;
+import static triangle.Debug.printStackTrace;
 
 public class SierpinskiTriangle {
     public static int SIZE = 1000;
@@ -80,25 +82,26 @@ public class SierpinskiTriangle {
         g2.setColor(Color.gray);
         g2.clearRect(0, 0, size.width, size.height);
         int offset = 25;
-        g2.draw3DRect(offset, offset, size.width - (2 * offset), size.height - (2 * offset), true);
-        offset += 6;
+        Dimension rectSize = new Dimension(size.width - 2*offset, size.height - 2*offset);
+        g2.drawRect(offset, offset, rectSize.width, rectSize.height);
+
         if (!waitForPause.inProgress()) {
-            g2.draw3DRect(offset, offset, size.width - (2 * offset), size.height - (2 * offset), true);
+            Dimension triangleSize = rectSize;
+            drawTriangle(triangleSize, g, new Dimension(offset, offset));
             print("countFullPaint " + ++countFullPaint);
-            try {
-                throw new Exception("countFullPaint " + countFullPaint);
-            } catch (Exception e) {
-                System.out.println("----------------------");
-                System.out.println(Thread.currentThread().getName());
-                System.out.println("----------- start  " + e.getMessage());
-                String stackTrace = Arrays.stream(e.getStackTrace()).map(ste -> ste.toString()).collect(Collectors.joining("\n"));
-                System.out.println(stackTrace);
-                System.out.println("----------- end    " + e.getMessage());
-                System.out.println(Thread.currentThread().getName());
-                System.out.println("----------------------");
-            }
+            printStackTrace("countFullPaint " + countFullPaint);
         }
 
+    }
+
+    private static void drawTriangle(Dimension size, Graphics g, Dimension offset) {
+        BufferedImage bufferedImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D gBuffer = (Graphics2D) bufferedImage.getGraphics();
+        int border = 6;
+        gBuffer.setColor(Color.darkGray);
+        gBuffer.drawString("Triangle goes here", border*2,border*4);
+        gBuffer.drawRect(border, border, size.width-2*border  , size.height-2*border );
+        g.drawImage(bufferedImage, offset.width, offset.height, null);
     }
 
 
