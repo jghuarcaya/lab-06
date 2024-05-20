@@ -28,6 +28,7 @@ public class WaitForPause implements Runnable {
         this.pause = pause * 1000000;
         this.action = action;
         thread = new Thread(this);
+        thread.setName("WaitForPause Thread");
     }
 
     /**

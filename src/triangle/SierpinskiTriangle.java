@@ -3,14 +3,17 @@ package triangle;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import static triangle.Debug.print;
+
 public class SierpinskiTriangle {
-   public static int SIZE = 1000;
-    int resizeDonePause = 500;
-    long lastResize = 0;
+    public static int SIZE = 1000;
+    int resizeDonePause = 2000;
 
     JFrame frame;
     JPanel panel;
@@ -28,8 +31,12 @@ public class SierpinskiTriangle {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    int resizeDone = 0;
+
     private void resizeDone() {
-        panel.paint(panel.getGraphics());
+        //panel.paint(panel.getGraphics());
+        frame.repaint();
+        print("resizeDone " + ++resizeDone);
     }
 
     private void addPanel() {
@@ -47,8 +54,9 @@ public class SierpinskiTriangle {
             @Override
             public void componentResized(ComponentEvent e) {
                 System.out.println("panelResized" + ++panelResized);
-                waitForPause.setInProgress();
+                if (waitForPause != null) waitForPause.setInProgress();
             }
+
         });
 
         frame.setLayout(new BorderLayout());
@@ -63,9 +71,10 @@ public class SierpinskiTriangle {
         SierpinskiTriangle triangle = new SierpinskiTriangle();
     }
 
-    int count = 0;
+    int countPaint = 0, countFullPaint = 0;
+
     public void paintSierpinskiTriangle(Graphics g, Dimension size) {
-        System.out.println("paintSierpinskiTriangle " + ++count);
+        print("countPaint " + ++countPaint);
         Graphics2D g2 = (Graphics2D) g;
         g2.setBackground(Color.white);
         g2.setColor(Color.gray);
@@ -73,11 +82,24 @@ public class SierpinskiTriangle {
         int offset = 25;
         g2.draw3DRect(offset, offset, size.width - (2 * offset), size.height - (2 * offset), true);
         offset += 6;
-        if (!waitForPause.inProgress())
+        if (!waitForPause.inProgress()) {
             g2.draw3DRect(offset, offset, size.width - (2 * offset), size.height - (2 * offset), true);
+            print("countFullPaint " + ++countFullPaint);
+            try {
+                throw new Exception("countFullPaint " + countFullPaint);
+            } catch (Exception e) {
+                System.out.println("----------------------");
+                System.out.println(Thread.currentThread().getName());
+                System.out.println("----------- start  " + e.getMessage());
+                String stackTrace = Arrays.stream(e.getStackTrace()).map(ste -> ste.toString()).collect(Collectors.joining("\n"));
+                System.out.println(stackTrace);
+                System.out.println("----------- end    " + e.getMessage());
+                System.out.println(Thread.currentThread().getName());
+                System.out.println("----------------------");
+            }
+        }
 
     }
-
 
 
 }
