@@ -1,52 +1,86 @@
 package triangle;
 
-/**
- * WaitForPause
- *
- */
+import static triangle.Debug.print;
 
+/**
+ * WaitForPause takes an inactivity threshold (in ms)
+ * and triggers the callback "action" as soon as
+ * "setInProgress()" hasn't been called for that long.
+ */
 public class WaitForPause implements Runnable {
-    long resizeDonePause = 0;
-    Thread thread;
-    boolean resizeInProgress = false;
-    long lastResize = 0;
+
+    long pause = 0;
     Runnable action;
-    public WaitForPause(long pause, Runnable action){
-        this.resizeDonePause = pause;
+    int sleep = 100;
+
+    long lastCall = 0;
+    boolean inProgress = false;
+    Thread thread;
+    boolean shouldRun = true;
+
+    /**
+     * Constructor for WaitForPause
+     *
+     * @param pause  in ms
+     * @param action Runnable that will be called after pause
+     */
+    public WaitForPause(int pause, Runnable action) {
+        this.pause = pause * 1000000;
         this.action = action;
         thread = new Thread(this);
     }
-    public void setInProgress() {
-        resizeInProgress = true;
-        lastResize = System.nanoTime();
-        System.out.println("resizeInProgress: " + resizeInProgress);
+
+    /**
+     * Constructor for WaitForPause
+     *
+     * @param pause  in ms
+     * @param action Runnable that will be called after pause
+     * @param sleep  in ms - time the action trigger thread sleeps
+     */
+    public WaitForPause(int pause, Runnable action, int sleep) {
+        this(pause, action);
+        this.sleep = sleep;
     }
-    public void setInProgress(boolean inProgress) { resizeInProgress = inProgress;}
+
+    /**
+     * call this method every time the action
+     * happens. Resets the lastCall time to
+     * the current time.
+     */
+    public void setInProgress() {
+        inProgress = true;
+        lastCall = System.nanoTime();
+        print("resizeInProgress: " + inProgress);
+    }
+
     @Override
     public void run() {
-        boolean panelClosed = false;
-        while (!panelClosed) {
+        while (shouldRun) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(sleep);
             } catch (InterruptedException e) {
                 //throw new RuntimeException(e);
             }
-            if (resizeInProgress && (System.nanoTime() - lastResize > resizeDonePause)) {
-                resizeInProgress = false;
-                lastResize = 0;
-                System.out.println("resizeInProgress: " + resizeInProgress);
-                panelClosed = false;
+            if (inProgress && (System.nanoTime() - lastCall > pause)) {
+                inProgress = false;
+                lastCall = 0;
+                print("resizeInProgress: " + inProgress);
                 action.run();
             }
         }
-        System.out.println("Thread done: " + panelClosed);
+        print("WaitForPause Thread done.");
     }
 
     public void start() {
         thread.start();
     }
 
-    public boolean inProgress() {
-        return resizeInProgress;
+    public void stop() {
+        shouldRun = false;
     }
+
+    public boolean inProgress() {
+        return inProgress;
+    }
+
 }

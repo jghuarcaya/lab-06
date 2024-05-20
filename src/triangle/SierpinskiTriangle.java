@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 public class SierpinskiTriangle {
    public static int SIZE = 1000;
-    long resizeDonePause = 500 * 1000000;
+    int resizeDonePause = 500;
     long lastResize = 0;
 
     JFrame frame;
