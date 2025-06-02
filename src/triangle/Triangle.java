@@ -5,6 +5,7 @@ import resizable.ResizableImage;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import static java.util.GregorianCalendar.BC;
 import static resizable.Debug.print;
 
 /**
@@ -31,13 +32,60 @@ public class Triangle implements ResizableImage {
         print("drawTriangle: " + ++drawTriangle + "size: " + size);
         BufferedImage bufferedImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D gBuffer = (Graphics2D) bufferedImage.getGraphics();
+
         gBuffer.setColor(Color.black);
         int border = 2;
         gBuffer.drawRect(border, border, size.width - 2 * border, size.height - 2 * border);
+
         gBuffer.setColor(Color.darkGray);
         border = 8;
         gBuffer.drawRect(border, border, size.width - 2 * border, size.height - 2 * border);
         gBuffer.drawString("Triangle goes here", border * 2, border * 4);
+
+        int padding = 20;
+
+        int maxWidth = size.width - 2 * padding;
+        int maxHeight = size.height - 2 * padding;
+
+        double side = Math.min(maxWidth, maxHeight / (Math.sqrt(3) / 2));
+        double height = (Math.sqrt(3) / 2) * side;
+
+        double centerX = size.width / 2.0;
+        double topY = (size.height - height) / 2.0;
+
+        int[] A = {(int) centerX, (int) topY};
+        int[] B = {(int) (centerX - side / 2), (int) (topY + height)};
+        int[] C = {(int) (centerX + side / 2), (int) (topY + height)};
+
+        int maxDepth = 6;
+
+        java.util.Stack<int[][]> stack = new java.util.Stack<>();
+        stack.push(new int[][]{A, B, C, new int[]{maxDepth}});
+
+        while (!stack.isEmpty()) {
+            int[][] item = stack.pop();
+            int[] top = item[0];
+            int[] left = item[1];
+            int[] right = item[2];
+            int depth = item[3][0];
+
+            if (depth == 0) {
+                int[] xPoints = {top[0], left[0], right[0]};
+                int[] yPoints = {top[1], left[1], right[1]};
+                gBuffer.fillPolygon(xPoints, yPoints, 3);
+            } else {
+                int[] tl = {(top[0] + left[0]) / 2, (top[1] + left[1]) / 2};
+                int[] lr = {(left[0] + right[0]) / 2, (left[1] + right[1]) / 2};
+                int[] rt = {(right[0] + top[0]) / 2, (right[1] + top[1]) / 2};
+
+                int next = depth - 1;
+
+                stack.push(new int[][]{top, tl, rt, new int[]{next}});
+                stack.push(new int[][]{tl, left, lr, new int[]{next}});
+                stack.push(new int[][]{rt, lr, right, new int[]{next}});
+            }
+        }
+
         return bufferedImage;
     }
 
